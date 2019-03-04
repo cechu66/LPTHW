@@ -10,7 +10,7 @@
 #with open("listurl.txt", "r") as ins:
 #    for line in ins:
 #        print (line, socket.gethostbyname(line.strip()))
-import sys, socket, requests
+import sys, socket, requests, urllib3
 
 RED = '\033[0;31;47m'
 BLUE = '\033[0;34;47m'
@@ -42,11 +42,15 @@ def get_Host_Name_IP():
 
 def get_http_header():
     get_url()
-	
+    http = urllib3.PoolManager()	
     #print (url)
     for x in content:
-        print(x)
-		
+        try:
+            f = http.request('GET', x)
+            #code = f.getcode()
+            print (f.status)
+        except:
+            print ("")		
 #get_url()        
 get_http_header()
 get_Host_Name_IP()
