@@ -1,0 +1,55 @@
+################################################
+# given list of url
+# 1.resolve ip address     
+# 2.check http code/timeout
+# 3.check ip header
+#    . redirect, not found, timeout, web server
+################################################
+
+
+#with open("listurl.txt", "r") as ins:
+#    for line in ins:
+#        print (line, socket.gethostbyname(line.strip()))
+import sys, socket, requests
+
+RED = '\033[0;31;47m'
+BLUE = '\033[0;34;47m'
+NORMAL = '\033[1;37;40m'
+
+def get_url():
+    global url
+    with open("listurl.txt", "r") as inFile:
+        #for line in inFile:
+        url = inFile.readlines()
+            #print(url)
+def get_Host_Name_IP():
+#    with open("listurl.txt", "r") as inFile:
+#        for line in inFile:
+#            try:
+#                host_name = line.strip()
+#                host_ip = socket.gethostbyname(line.strip())
+#                print(host_name, ": ", host_ip)
+#            except socket.error:
+#                print(host_name, ": invalid url")
+    get_url()
+    for line in url:
+        ip = socket.gethostbyname(line)
+        print (ip)
+        #try:
+        #    print (line, end = "")
+        #    #host_ip = socket.gethostbyname(line)
+        #    #print (url, ": ", host_ip)
+        #except socket.error:
+        #    print("aaa")
+
+def get_http_header():
+    get_url()
+	
+    #print (url)
+    for line in url:
+        
+        print("abc", line)
+		
+        
+#get_http_header()
+get_Host_Name_IP()
