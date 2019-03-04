@@ -11,19 +11,21 @@
 #    for line in ins:
 #        print (line, socket.gethostbyname(line.strip()))
 import sys, socket, requests, urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 RED = '\033[0;31;47m'
 BLUE = '\033[0;34;47m'
 NORMAL = '\033[1;37;40m'
 
-def get_url():
-    global content
-    with open("listurl.txt", "r") as inFile:
-        #for line in inFile:
-        url = inFile.readlines()
-        content = [x.strip() for x in url]
-        #print (content)
-def get_Host_Name_IP():
+#def get_url():
+#    global content
+#    with open("listurl.txt", "r") as inFile:
+#        #for line in inFile:
+#        url = inFile.readlines()
+#        content = [x.strip() for x in url]
+#        #print (content)
+def get_Host_Name_IP(x):
+    global host_ip
 #    with open("listurl.txt", "r") as inFile:
 #        for line in inFile:
 #            try:
@@ -33,24 +35,39 @@ def get_Host_Name_IP():
 #            except socket.error:
 #                print(host_name, ": invalid url")
     get_url()
-    for x in content:
-        try:
-            host_ip = socket.gethostbyname(x)
-            print (x, ":    ", host_ip)
-        except socket.error:
-            print(x, ":url is invalid") 
+    #for x in content:
+    try:
+        host_ip = socket.gethostbyname(x)
+        return host_ip
+            #print (x, ":    ", host_ip)
+    except socket.error:
+        print(x, ":url is invalid") 
 
-def get_http_header():
+def get_http_header(url):
+    global response
     get_url()
     http = urllib3.PoolManager()	
     #print (url)
-    for x in content:
-        try:
-            f = http.request('GET', x)
-            #code = f.getcode()
-            print (f.status)
-        except:
-            print ("")		
-#get_url()        
-get_http_header()
-get_Host_Name_IP()
+    #for x in content:
+    try:
+        response = http.request('GET', url)
+        code = response.status
+            #print (response.status)
+        return code
+    except:
+        print ("abcdef")
+
+def main():
+    global content
+    with open("listurl.txt", "r") as inFile:
+        #for line in inFile:
+        url = inFile.readlines()
+        content = [x.strip() for x in url]
+        for x in content:
+            ip = get_Host_Name_IP(x)
+            status = get_http_header(x)
+            print (x, ": ", ip, status)
+
+#get_url() 
+if __name__ == '__main__':
+    main()
