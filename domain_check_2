@@ -1,4 +1,5 @@
 https://stackoverflow.com/questions/21965484/timeout-for-python-requests-get-entire-response
+http://zetcode.com/web/pythonrequests/
 
 import requests, urllib3
 
