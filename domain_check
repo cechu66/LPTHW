@@ -7,9 +7,6 @@
 ################################################
 
 
-#with open("listurl.txt", "r") as ins:
-#    for line in ins:
-#        print (line, socket.gethostbyname(line.strip()))
 import sys, socket, requests, urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -17,57 +14,58 @@ RED = '\033[0;31;47m'
 BLUE = '\033[0;34;47m'
 NORMAL = '\033[1;37;40m'
 
-#def get_url():
-#    global content
-#    with open("listurl.txt", "r") as inFile:
-#        #for line in inFile:
-#        url = inFile.readlines()
-#        content = [x.strip() for x in url]
-#        #print (content)
+
 def get_Host_Name_IP(x):
     global host_ip
-#    with open("listurl.txt", "r") as inFile:
-#        for line in inFile:
-#            try:
-#                host_name = line.strip()
-#                host_ip = socket.gethostbyname(line.strip())
-#                print(host_name, ": ", host_ip)
-#            except socket.error:
-#                print(host_name, ": invalid url")
-    get_url()
-    #for x in content:
+
     try:
         host_ip = socket.gethostbyname(x)
         return host_ip
-            #print (x, ":    ", host_ip)
     except socket.error:
-        print(x, ":url is invalid") 
+        print(x, ":url is invalid. Could not resolve")
 
 def get_http_header(url):
     global response
-    get_url()
-    http = urllib3.PoolManager()	
-    #print (url)
-    #for x in content:
-    try:
-        response = http.request('GET', url)
-        code = response.status
-            #print (response.status)
-        return code
-    except:
-        print ("abcdef")
 
+    try:
+        s = requests.Session()
+        response = s.get("http://"+url,timeout=10, allow_redirects=False)
+        response_header = s.head("http://"+url)
+        return response.status_code, response_header.headers
+        response.history
+        for resp in response.history:
+            resp.raise_for_status()
+            return resp.status_code
+    except requests.exceptions.HTTPError as errh:
+        return errh
+    except requests.exceptions.Timeout as errt:
+        return errt
+    except requests.exceptions.ConnectionError as errc:
+        return errc
+    except requests.exceptions.RequestException as err:
+        return err
+#    except:
+#        return 0
+    
 def main():
-    global content
+    #global content
     with open("listurl.txt", "r") as inFile:
         #for line in inFile:
         url = inFile.readlines()
         content = [x.strip() for x in url]
         for x in content:
             ip = get_Host_Name_IP(x)
-            status = get_http_header(x)
-            print (x, ": ", ip, status)
+            #status = get_http_header(x)
+            he     = get_http_header(x)
+            print("Server: " + he)
+            #if (status == 200):
+            #    print(x, ": ", ip, status, "site OK")
+            #elif (status == 301):
+            #    print(x, ": ", ip, status, "site redirected")
+            #elif (status == 404):
+            #    print(x, ": ", ip, status, "page not found")
+            #else:
+            #    print("aa")
 
-#get_url() 
 if __name__ == '__main__':
     main()
