@@ -6,9 +6,11 @@ import requests, urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 data=[]
-websites=['http://stackoverflow.com', 'http://rainmaker-labs.com']
+websites=['http://rainmaker-labs.com']
 for w in websites:
-    r= requests.get(w, verify=False)
-    data.append( (r.url, len(r.content), r.elapsed.total_seconds(), str([(l.status_code, l.url) for l in r.history]), str(r.headers.items())) )
-    for i in data:
-        r = i.strip("")
+    r = requests.get(w, verify=False)
+    r2 = requests.head(w, verify=False)
+    data.append( (r.url, len(r.content), r.elapsed.total_seconds(), str([(l.status_code, l.url) for l in r.history]), str(r.headers['server']) ))
+    print(data)
+    if (str(r.headers['server']) == "nginx"):
+        print("found")
