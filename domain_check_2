@@ -1,16 +1,62 @@
 https://stackoverflow.com/questions/21965484/timeout-for-python-requests-get-entire-response
 http://zetcode.com/web/pythonrequests/
 
-import requests, urllib3
+################################################
+# given list of url
+# 1.resolve ip address     
+# 2.check http code/timeout
+# 3.check ip header
+#    . redirect, not found, timeout, web server
+################################################
 
+
+import sys, socket, requests, urllib3
+from colorama import Fore, Back, Style
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-data=[]
-websites=['http://rainmaker-labs.com']
-for w in websites:
-    r = requests.get(w, verify=False)
-    r2 = requests.head(w, verify=False)
-    data.append( (r.url, len(r.content), r.elapsed.total_seconds(), str([(l.status_code, l.url) for l in r.history]), str(r.headers['server']) ))
-    print(data)
-    if (str(r.headers['server']) == "nginx"):
-        print("found")
+
+def get_Host_Name_IP(x):
+    global host_ip
+
+    try:
+        host_ip = socket.gethostbyname(x)
+        return host_ip
+    except socket.error:
+        print(x, ":url is invalid. Could not resolve")
+
+
+def main():
+    #
+    with open("listurl.txt", "r") as inFile:
+        #
+        url = inFile.readlines()
+        content = [x.strip() for x in url]
+        for x in content:
+		    ### dns resolve
+            ip = get_Host_Name_IP(x)
+            ### Get HTTP reponse
+            try:
+                #
+                resp = requests.get("http://"+x, timeout=10, allow_redirects=False)
+                resp.history
+                if (resp.status_code == 200):
+                    print(x, ": ", ip, resp.status_code, "Server: ", str(resp.headers['server']), "site OK")
+                elif (resp.status_code == 301):
+                    print(x, ": ", ip, resp.status_code, "Server: ", str(resp.headers['server']), "site redirected")
+                elif (resp.status_code == 404):
+                    print(x, ": ", ip, resp.status_code, "Server: ", str(resp.headers['server']), "page not found")
+                else:
+                    print("OOPS something wrong")				
+
+            except requests.exceptions.HTTPError as errh:
+                print("HTTP Error: ",errh)
+            except requests.exceptions.Timeout as errt:
+                print("TimeOut Error: ",errt)
+            except requests.exceptions.ConnectionError as errc:
+                print("Connection Error: ",errc)
+            except requests.exceptions.RequestException as err:
+                print("OOPS Something Else: ",err)             
+
+
+if __name__ == '__main__':
+   main()
