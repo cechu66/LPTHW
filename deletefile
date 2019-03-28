@@ -1,0 +1,18 @@
+import os
+import sys 
+import shutil
+#from optparse import OptionParser
+#
+#parser = OptionParser()
+#paser.add_option("-f")
+path = sys.argv[1]
+
+try:
+    with os.scandir(path) as entries:
+        for entry in entries:
+            if entry.is_file() or entry.is_symlink():
+                os.unlink(entry.path)
+            elif entry.is_dir():
+                shutil.rmtree(entry.path)
+except OSError as e:
+    print("Error: %s" % (e.filename))
