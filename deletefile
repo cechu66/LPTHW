@@ -6,6 +6,7 @@ import shutil
 #parser = OptionParser()
 #paser.add_option("-f")
 path = sys.argv[1]
+# if "-f": delete file/ if -d: delete folder
 
 try:
     with os.scandir(path) as entries:
